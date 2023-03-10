@@ -190,6 +190,18 @@ public class DatasetApi extends AbstractTargetedApi {
         return putToTarget("editMetadata", s, queryParams, DatasetVersion.class);
     }
 
+    public DataverseResponse<DatasetVersion> editMetadata(String s, Boolean replace, HashMap<String, List<String>> extraQueryParams) throws IOException, DataverseException {
+        log.trace("ENTER");
+        HashMap<String, List<String>> queryParams = new HashMap<>(extraQueryParams);
+        if (replace)
+            /*
+             * Sic! any value for "replace" is interpreted by Dataverse as "true", even "replace=false"
+             * It is by the *absence* of the parameter that replace is set to false.
+             */
+            queryParams.put("replace", singletonList("true"));
+        return putToTarget("editMetadata", s, queryParams, DatasetVersion.class);
+    }
+
     /**
      * Edits the current draft's metadata, adding the fields that do not exist yet. If `replace` is set to `false`, all specified fields must be either currently empty or allow
      * multiple values.
@@ -205,6 +217,10 @@ public class DatasetApi extends AbstractTargetedApi {
         return editMetadata(httpClientWrapper.writeValueAsString(fields), replace);
     }
 
+    public DataverseResponse<DatasetVersion> editMetadata(FieldList fields, Boolean replace, HashMap<String, List<String>> extraQueryParams) throws IOException, DataverseException {
+        return editMetadata(httpClientWrapper.writeValueAsString(fields), replace, extraQueryParams);
+    }
+
     /**
      * Edits the current draft's metadata, adding the fields that do not exist yet.
      *
@@ -216,6 +232,10 @@ public class DatasetApi extends AbstractTargetedApi {
      */
     public DataverseResponse<DatasetVersion> editMetadata(FieldList fields) throws IOException, DataverseException {
         return editMetadata(httpClientWrapper.writeValueAsString(fields), true);
+    }
+
+    public DataverseResponse<DatasetVersion> editMetadata(FieldList fields, HashMap<String, List<String>> extraQueryParams) throws IOException, DataverseException {
+        return editMetadata(httpClientWrapper.writeValueAsString(fields), true, extraQueryParams);
     }
 
     // TODO https://guides.dataverse.org/en/latest/api/native-api.html#export-metadata-of-a-dataset-in-various-formats
