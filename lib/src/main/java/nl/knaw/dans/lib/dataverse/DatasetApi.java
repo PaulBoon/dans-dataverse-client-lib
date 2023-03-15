@@ -55,7 +55,7 @@ import static java.util.Collections.singletonMap;
 public class DatasetApi extends AbstractTargetedApi {
 
     private static final Logger log = LoggerFactory.getLogger(DatasetApi.class);
-    private static final String metadataKeyParamNamePrefix = "mdkey.";
+    private static final String MDKEY_PARAM_NAME_PREFIX = "mdkey.";
     
     protected DatasetApi(HttpClientWrapper httpClientWrapper, String id, boolean isPersistentId) {
         this(httpClientWrapper, id, isPersistentId, null);
@@ -189,11 +189,24 @@ public class DatasetApi extends AbstractTargetedApi {
         return putToTarget("editMetadata", s, queryParams, DatasetVersion.class);
     }
 
+    /**
+     * Edits the current draft's metadata, adding the fields that do not exist yet. If `replace` is set to `false`, all specified fields must be either currently empty or allow
+     * multiple values. 
+     * Whenever there are metadata field from a block that is protected by a 'key', the corresponding keys must be provided. 
+     *
+     * @param s       JSON document containing the edits to perform
+     * @param replace whether to replace existing values
+     * @param metadataKeys  the HashMap maps the names of the metadata blocks to their 'secret' key values.  
+     * @return DatasetVersion
+     * @throws IOException        when I/O problems occur during the interaction with Dataverse
+     * @throws DataverseException when Dataverse fails to perform the request
+     * @see <a href="https://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata" target="_blank">Dataverse documentation</a>
+     */
     public DataverseResponse<DatasetVersion> editMetadata(String s, Boolean replace, HashMap<String, String> metadataKeys) throws IOException, DataverseException {
         log.trace("ENTER");
         HashMap<String, List<String>> queryParams = new HashMap<>(metadataKeys.entrySet().stream()
                 .collect(Collectors.toMap(
-                        e -> metadataKeyParamNamePrefix + e.getKey(),
+                        e -> MDKEY_PARAM_NAME_PREFIX + e.getKey(),
                         e -> Collections.singletonList(e.getValue())
                 )));
         if (replace)
