@@ -40,10 +40,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -57,7 +55,8 @@ import static java.util.Collections.singletonMap;
 public class DatasetApi extends AbstractTargetedApi {
 
     private static final Logger log = LoggerFactory.getLogger(DatasetApi.class);
-
+    private static final String metadataKeyParamNamePrefix = "mdkey.";
+    
     protected DatasetApi(HttpClientWrapper httpClientWrapper, String id, boolean isPersistentId) {
         this(httpClientWrapper, id, isPersistentId, null);
     }
@@ -190,9 +189,13 @@ public class DatasetApi extends AbstractTargetedApi {
         return putToTarget("editMetadata", s, queryParams, DatasetVersion.class);
     }
 
-    public DataverseResponse<DatasetVersion> editMetadata(String s, Boolean replace, HashMap<String, List<String>> extraQueryParams) throws IOException, DataverseException {
+    public DataverseResponse<DatasetVersion> editMetadata(String s, Boolean replace, HashMap<String, String> metadataKeys) throws IOException, DataverseException {
         log.trace("ENTER");
-        HashMap<String, List<String>> queryParams = new HashMap<>(extraQueryParams);
+        HashMap<String, List<String>> queryParams = new HashMap<>(metadataKeys.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> metadataKeyParamNamePrefix + e.getKey(),
+                        e -> Collections.singletonList(e.getValue())
+                )));
         if (replace)
             /*
              * Sic! any value for "replace" is interpreted by Dataverse as "true", even "replace=false"
@@ -217,8 +220,8 @@ public class DatasetApi extends AbstractTargetedApi {
         return editMetadata(httpClientWrapper.writeValueAsString(fields), replace);
     }
 
-    public DataverseResponse<DatasetVersion> editMetadata(FieldList fields, Boolean replace, HashMap<String, List<String>> extraQueryParams) throws IOException, DataverseException {
-        return editMetadata(httpClientWrapper.writeValueAsString(fields), replace, extraQueryParams);
+    public DataverseResponse<DatasetVersion> editMetadata(FieldList fields, Boolean replace, HashMap<String, String> metadataKeys) throws IOException, DataverseException {
+        return editMetadata(httpClientWrapper.writeValueAsString(fields), replace, metadataKeys);
     }
 
     /**
@@ -234,8 +237,8 @@ public class DatasetApi extends AbstractTargetedApi {
         return editMetadata(httpClientWrapper.writeValueAsString(fields), true);
     }
 
-    public DataverseResponse<DatasetVersion> editMetadata(FieldList fields, HashMap<String, List<String>> extraQueryParams) throws IOException, DataverseException {
-        return editMetadata(httpClientWrapper.writeValueAsString(fields), true, extraQueryParams);
+    public DataverseResponse<DatasetVersion> editMetadata(FieldList fields, HashMap<String, String> metadataKeys) throws IOException, DataverseException {
+        return editMetadata(httpClientWrapper.writeValueAsString(fields), true, metadataKeys);
     }
 
     // TODO https://guides.dataverse.org/en/latest/api/native-api.html#export-metadata-of-a-dataset-in-various-formats
