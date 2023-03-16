@@ -163,7 +163,7 @@ public class DatasetApi extends AbstractTargetedApi {
      * @see <a href="https://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata" target="_blank">Dataverse documentation</a>
      */
     public DataverseResponse<DatasetVersion> editMetadata(String s) throws IOException, DataverseException {
-        return editMetadata(s, true);
+        return editMetadata(s, true, emptyMap());
     }
 
     public DataverseResponse<DatasetVersion> editMetadata(String s, Map<String, String> metadataKeys) throws IOException, DataverseException {
@@ -201,7 +201,7 @@ public class DatasetApi extends AbstractTargetedApi {
      */
     public DataverseResponse<DatasetVersion> editMetadata(String s, Boolean replace, Map<String, String> metadataKeys) throws IOException, DataverseException {
         log.trace("ENTER");
-        HashMap<String, List<String>> queryParams = getQueryParamsFromMetadataKeys(metadataKeys);
+        Map<String, List<String>> queryParams = getQueryParamsFromMetadataKeys(metadataKeys);
         if (replace)
             /*
              * Sic! any value for "replace" is interpreted by Dataverse as "true", even "replace=false"
@@ -279,7 +279,7 @@ public class DatasetApi extends AbstractTargetedApi {
      * @see <a href="https://guides.dataverse.org/en/latest/developers/dataset-semantic-metadata-api.html#add-dataset-metadata" target="_blank">Dataverse documentation</a>
      */
     public DataverseResponse<Object> updateMetadataFromJsonLd(String metadata, boolean replace, Map<String, String> metadataKeys) throws IOException, DataverseException {
-        HashMap<String, List<String>> queryParams = getQueryParamsFromMetadataKeys(metadataKeys);
+        Map<String, List<String>> queryParams = getQueryParamsFromMetadataKeys(metadataKeys);
         queryParams.put("replace", singletonList((String.valueOf(replace))));
         return httpClientWrapper.putJsonLdString(subPath("metadata"), metadata, params(queryParams), extraHeaders, RoleAssignmentReadOnly.class);
     }
@@ -296,7 +296,7 @@ public class DatasetApi extends AbstractTargetedApi {
     }
 
     public DataverseResponse<DatasetVersion> updateMetadata(String s, Map<String, String> metadataKeys) throws IOException, DataverseException {
-        HashMap<String, List<String>> queryParams = getQueryParamsFromMetadataKeys(metadataKeys);
+        Map<String, List<String>> queryParams = getQueryParamsFromMetadataKeys(metadataKeys);
         // Cheating with endPoint here, because the only version that can be updated is :draft anyway
         return putToTarget("versions/:draft", s, queryParams, DatasetVersion.class);
     }
@@ -616,11 +616,11 @@ public class DatasetApi extends AbstractTargetedApi {
             throw new RuntimeException(String.format("%s. Number of tries = %d, wait time between tries = %d ms.", errorMessage, maxNumberOfRetries, waitTimeInMilliseconds));
     }
     
-    private HashMap<String, List<String>> getQueryParamsFromMetadataKeys(Map<String, String> metadataKeys) {
-         return new HashMap<>(metadataKeys.entrySet().stream()
+    private Map<String, List<String>> getQueryParamsFromMetadataKeys(Map<String, String> metadataKeys) {
+         return metadataKeys.entrySet().stream()
                 .collect(Collectors.toMap(
                         e -> MDKEY_PARAM_NAME_PREFIX + e.getKey(),
                         e -> Collections.singletonList(e.getValue())
-                )));
+                ));
     }
 }
