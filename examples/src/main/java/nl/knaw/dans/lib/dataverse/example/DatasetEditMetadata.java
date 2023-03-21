@@ -34,11 +34,10 @@ public class DatasetEditMetadata extends ExampleBase {
         String title = args[1];
 
         var keyMap = new HashMap<String, String>();
-        if (args.length > 3) {
-            var mdBlockName = args[2];
-            var mdKeyValue = args[3];
-            keyMap.put(mdBlockName, mdKeyValue);
-            System.out.println("Supplied metadata key (name, value): (" + mdBlockName + ", " + mdKeyValue + ")" );
+        if (args.length > 2) {
+            var mdKeyValue = args[2];
+            keyMap.put("citation", mdKeyValue);
+            System.out.println("Supplied citation metadata key: " + mdKeyValue );
         }
 
         FieldList fieldList = new FieldList();

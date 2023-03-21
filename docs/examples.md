@@ -54,12 +54,12 @@ When you have set up Dataverse to protect the citation metadata block with a sec
 
 Allows to change the `title` of the Dataset. Add the secret key if the citation block was protected. 
 
-        $DOI "My Edited Dataset" citation mysecretkey
+        $DOI "My Edited Dataset" mysecretkey
 
 
 ## DataverseCreateDataset
 
 Creates a new Dataset with metadata set in code. Add the secret key if the citation block was protected.
 
-        citation mysecretkey
+        mysecretkey
 

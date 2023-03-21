@@ -38,11 +38,10 @@ public class DatasetUpdateMetadata extends ExampleBase {
     public static void main(String[] args) throws Exception {
         String persistentId = args[0];
         var keyMap = new HashMap<String, String>();
-        if (args.length > 2) {
-            var mdBlockName = args[1];
-            var mdKeyValue = args[2];
-            keyMap.put(mdBlockName, mdKeyValue);
-            System.out.println("Supplied metadata key (name, value): (" + mdBlockName + ", " + mdKeyValue + ")");
+        if (args.length > 1) {
+            var mdKeyValue = args[1];
+            keyMap.put("citation", mdKeyValue);
+            System.out.println("Supplied citation metadata key: " + mdKeyValue );
         }
 
         MetadataBlock citation = new MetadataBlock();

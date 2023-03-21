@@ -39,11 +39,10 @@ public class DataverseCreateDataset extends ExampleBase {
 
     public static void main(String[] args) throws Exception {
         var keyMap = new HashMap<String, String>();
-        if (args.length > 1) {
-            var mdBlockName = args[0];
-            var mdKeyValue = args[1];
-            keyMap.put(mdBlockName, mdKeyValue);
-            System.out.println("Supplied metadata key (name, value): (" + mdBlockName + ", " + mdKeyValue + ")" );
+        if (args.length > 0) {
+            var mdKeyValue = args[0];
+            keyMap.put("citation", mdKeyValue);
+            System.out.println("Supplied citation metadata key: " + mdKeyValue );
         }
 
         MetadataBlock citation = new MetadataBlock();
