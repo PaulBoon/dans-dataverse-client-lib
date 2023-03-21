@@ -32,11 +32,20 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class DataverseCreateDataset extends ExampleBase {
     private static final Logger log = LoggerFactory.getLogger(DataverseCreateDataset.class);
 
     public static void main(String[] args) throws Exception {
+        var keyMap = new HashMap<String, String>();
+        if (args.length > 1) {
+            var mdBlockName = args[0];
+            var mdKeyValue = args[1];
+            keyMap.put(mdBlockName, mdKeyValue);
+            System.out.println("Supplied metadata key (name, value): (" + mdBlockName + ", " + mdKeyValue + ")" );
+        }
+
         MetadataBlock citation = new MetadataBlock();
         citation.setName("citation");
         citation.setDisplayName("Citation Metadata");
@@ -73,7 +82,7 @@ public class DataverseCreateDataset extends ExampleBase {
         log.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataset));
         log.info("--- END JSON OBJECT ---");
 
-        DataverseHttpResponse<DatasetCreationResult> r = client.dataverse("root").createDataset(dataset);
+        DataverseHttpResponse<DatasetCreationResult> r = client.dataverse("root").createDataset(dataset, keyMap);
         log.info("Status Line: {}", r.getHttpResponse().getStatusLine());
         log.info("DOI: {}", r.getData().getPersistentId());
 
