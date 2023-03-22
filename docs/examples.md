@@ -17,8 +17,13 @@ because it does not need any input and simply returns the `view` of the root ver
 
 In the following example program arguments the `$DOI` is a placeholder for a DOI of the Dataset that is being manipulated; lie `doi:10.5072/FK2/ABCD`. 
 
+## Examples that mutate the dataset metadata
 
-## DatasetUpdateMetadataFromJsonLd
+These potentially need a system metadata key to work. 
+If you don't provide the right key you get an error message: 
+"Updating system metadata in block citation requires a valid key". 
+
+### DatasetUpdateMetadataFromJsonLd
 
 Updates the metadata of a dataset using the JSON-LD format. 
 
@@ -42,7 +47,7 @@ or back to default
 For the license change no system metadata key is needed. 
 
 
-## DatasetUpdateMetadata
+### DatasetUpdateMetadata
 
 This sets all values in code, the only thing you need to provide is a DOI.
 When you have set up Dataverse to protect the citation metadata block with a secret key you need provide this also.
@@ -50,16 +55,22 @@ When you have set up Dataverse to protect the citation metadata block with a sec
     $DOI citation mysecretkey
 
 
-## DatasetEditMetadata
+### DatasetEditMetadata
 
 Allows to change the `title` of the Dataset. Add the secret key if the citation block was protected. 
 
-        $DOI "My Edited Dataset" mysecretkey
+    $DOI "My Edited Dataset" mysecretkey
 
 
-## DataverseCreateDataset
+### DataverseCreateDataset
 
 Creates a new Dataset with metadata set in code. Add the secret key if the citation block was protected.
 
-        mysecretkey
+    mysecretkey
 
+### DataverseImportDataset
+
+Imports a Dataset with metadata set in code. The DOI is automatically generated in the test code. 
+Add the secret key if the citation block was protected.
+
+    mysecretkey
