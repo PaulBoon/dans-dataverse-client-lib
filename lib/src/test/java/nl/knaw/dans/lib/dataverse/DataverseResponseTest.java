@@ -53,22 +53,24 @@ public class DataverseResponseTest extends MapperFixture {
         Assertions.assertEquals(3, r.getData().getVersionNumber());
         Assertions.assertEquals(5, r.getData().getFiles().size());
     }
-//DatasetVersionWithAddedPropsUpTov5.14
-@Test
-public void DatasetVersionWithAddedPropsUpTov5_14ResponseCanBeDeserialized() throws Exception {
-    DataverseResponse<DatasetVersion> r =
-        new DataverseResponse<>(FileUtils.readFileToString(getTestJsonFileFor(classUnderTest,
-            "DatasetVersionWithAddedPropsUpTov5_14"), StandardCharsets.UTF_8),
-            mapper, DatasetVersion.class);
-    // check some standard properties
-    Assertions.assertEquals(2, r.getData().getDatasetId());
-    Assertions.assertEquals(3, r.getData().getVersionNumber());
-    Assertions.assertEquals(5, r.getData().getFiles().size());
-    // check some added properties
-    Assertions.assertEquals(new URI("https://licensebuttons.net/l/zero/1.0/88x31.png"), r.getData().getLicense().getIconUri());
-}
 
-
+    @Test
+    public void DatasetVersionWithAddedPropsUpTov5_14ResponseCanBeDeserialized() throws Exception {
+        DataverseResponse<DatasetVersion> r =
+            new DataverseResponse<>(FileUtils.readFileToString(getTestJsonFileFor(classUnderTest,
+                "DatasetVersionWithAddedPropsUpTov5_14"), StandardCharsets.UTF_8),
+                mapper, DatasetVersion.class);
+        // check some standard properties
+        Assertions.assertEquals(2, r.getData().getDatasetId());
+        Assertions.assertEquals(3, r.getData().getVersionNumber());
+        Assertions.assertEquals(5, r.getData().getFiles().size());
+        // check added properties
+        Assertions.assertEquals(new URI("https://licensebuttons.net/l/zero/1.0/88x31.png"), r.getData().getLicense().getIconUri());
+        Assertions.assertEquals("2023-01-10", r.getData().getPublicationDate());
+        Assertions.assertEquals("2023-01-10", r.getData().getCitationDate());
+        Assertions.assertEquals("hdl:10695/test-12345", r.getData().getAlternativePersistentId());
+        Assertions.assertEquals("Documentation", r.getData().getFiles().get(4).getDataFile().getCategories().get(0));
+    }
 
 //    @Test
 //    public void nestedTypeParametersCanBeDeserialized() throws Exception {
