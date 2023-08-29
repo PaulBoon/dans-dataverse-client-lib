@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 public class DataverseResponseTest extends MapperFixture {
@@ -52,6 +53,22 @@ public class DataverseResponseTest extends MapperFixture {
         Assertions.assertEquals(3, r.getData().getVersionNumber());
         Assertions.assertEquals(5, r.getData().getFiles().size());
     }
+//DatasetVersionWithAddedPropsUpTov5.14
+@Test
+public void DatasetVersionWithAddedPropsUpTov5_14ResponseCanBeDeserialized() throws Exception {
+    DataverseResponse<DatasetVersion> r =
+        new DataverseResponse<>(FileUtils.readFileToString(getTestJsonFileFor(classUnderTest,
+            "DatasetVersionWithAddedPropsUpTov5_14"), StandardCharsets.UTF_8),
+            mapper, DatasetVersion.class);
+    // check some standard properties
+    Assertions.assertEquals(2, r.getData().getDatasetId());
+    Assertions.assertEquals(3, r.getData().getVersionNumber());
+    Assertions.assertEquals(5, r.getData().getFiles().size());
+    // check some added properties
+    Assertions.assertEquals(new URI("https://licensebuttons.net/l/zero/1.0/88x31.png"), r.getData().getLicense().getIconUri());
+}
+
+
 
 //    @Test
 //    public void nestedTypeParametersCanBeDeserialized() throws Exception {
