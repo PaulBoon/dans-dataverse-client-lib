@@ -135,10 +135,47 @@ public class DatasetApi extends AbstractTargetedApi {
     }
 
     public DataverseHttpResponse<DataMessage> publish(UpdateType updateType, boolean assureIsIndexed) throws IOException, DataverseException {
+        if (assureIsIndexed) return publishWithRetriesForAwaitIndexing(updateType);
+        else return publishWithoutRetries(updateType, false);
+    }
+
+    private DataverseHttpResponse<DataMessage> publishWithoutRetries(UpdateType updateType, boolean assureIsIndexed) throws IOException, DataverseException {
         HashMap<String, List<String>> parameters = new HashMap<>();
         parameters.put("assureIsIndexed", singletonList(String.valueOf(assureIsIndexed)));
         parameters.put("type", singletonList(updateType.toString()));
         return httpClientWrapper.postJsonString(subPath(publish), "", params(parameters), new HashMap<>(), DataMessage.class);
+    }
+
+    private DataverseHttpResponse<DataMessage> publishWithRetriesForAwaitIndexing(UpdateType updateType) throws IOException, DataverseException {
+        int publishAwaitIndexingMaxNumberOfRetries = 10;
+        int publishAwaitIndexingMillisecondsBetweenRetries = 1000;
+
+        int retry_count = 0;
+        while (retry_count < publishAwaitIndexingMaxNumberOfRetries) {
+            try {
+                return publishWithoutRetries(updateType, true);
+            } catch (DataverseException e) {
+                if (e.getStatus() != 409) {
+                    log.error("Not an awaiting indexing status {}, rethrowing exception", e.getStatus());
+                    throw e;
+                }
+                log.info("Attempt to publish dataset failed because Dataset is awaiting indexing");
+                retry_count++;
+                log.info("Retry count: {}", retry_count);
+                if(retry_count == publishAwaitIndexingMaxNumberOfRetries) {
+                    log.error("Max retries ({}) reached, stop trying to publish dataset", publishAwaitIndexingMaxNumberOfRetries);
+                    throw e;
+                }
+                try {
+                    log.info("Sleeping for {} milliseconds before trying again", publishAwaitIndexingMillisecondsBetweenRetries);
+                    Thread.sleep(publishAwaitIndexingMillisecondsBetweenRetries);
+                }
+                catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+        throw new RuntimeException("This should never happen, either should have returned or thrown another error");
     }
 
     public DataverseHttpResponse<DatasetPublicationResult> releaseMigrated(String publicationDateJsonLd, boolean assureIsIndexed) throws IOException, DataverseException {
