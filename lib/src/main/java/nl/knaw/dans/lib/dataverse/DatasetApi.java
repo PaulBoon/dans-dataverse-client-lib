@@ -29,6 +29,7 @@ import nl.knaw.dans.lib.dataverse.model.dataset.FileList;
 import nl.knaw.dans.lib.dataverse.model.dataset.UpdateType;
 import nl.knaw.dans.lib.dataverse.model.file.FileMeta;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
@@ -168,19 +169,19 @@ public class DatasetApi extends AbstractTargetedApi {
             try {
                 return publishWithoutRetries(updateType, true);
             } catch (DataverseException e) {
-                if (e.getStatus() != 409) {
+                if (e.getStatus() != HttpStatus.SC_CONFLICT) {
                     log.error("Not an awaiting indexing status {}, rethrowing exception", e.getStatus());
                     throw e;
                 }
-                log.info("Attempt to publish dataset failed because Dataset is awaiting indexing");
+                log.debug("Attempt to publish dataset failed because Dataset is awaiting indexing");
                 retry_count++;
-                log.info("Retry count: {}", retry_count);
+                log.debug("Retry count: {}", retry_count);
                 if(retry_count == awaitIndexingMaxNumberOfRetries) {
                     log.error("Max retries ({}) reached, stop trying to publish dataset", awaitIndexingMaxNumberOfRetries);
                     throw e;
                 }
                 try {
-                    log.info("Sleeping for {} milliseconds before trying again", awaitIndexingMillisecondsBetweenRetries);
+                    log.debug("Sleeping for {} milliseconds before trying again", awaitIndexingMillisecondsBetweenRetries);
                     Thread.sleep(awaitIndexingMillisecondsBetweenRetries);
                 }
                 catch (InterruptedException ex) {
